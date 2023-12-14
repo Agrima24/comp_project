@@ -205,9 +205,33 @@ const acknowledgeAssignment = async (req, res) => {
   }
 };
 
+const getId = async (req,res) => {
+  try{
+   const query = `
+   select 
+   c.candidate_name,
+   u.user_name
+   from main m
+   left join candidates c on c.candidate_id = m.candidate_id
+   left join users u on u.user_id = m.user_id;
+ `
+   const result = await pool.query(query);
+    res.status(200).json({
+      success: true,
+      data: result.rows,
+    });
+   }catch(err){
+     res.status(400).json({
+      success: false,
+      error : err.message
+     })
+  }
+}
+
 module.exports = {
   createAssignment,
   getAssignmentsForUser,
-  acknowledgeAssignment
+  acknowledgeAssignment,
+  getId
 };
 

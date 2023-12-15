@@ -1,4 +1,6 @@
 const pool = require('../database/db');
+const {addNotification} = require('../utils/notification');
+const {getNotifications} = require('../utils/notification');
 
 const createAssignment = async (req, res) => {
   try {
@@ -192,12 +194,44 @@ const acknowledgeAssignment = async (req, res) => {
 
     await pool.query(updateMainQuery, [acknowledge_name, main_id]);
 
+    const userQuery = 'SELECT user_name FROM users WHERE user_id = $1';
+    const userResult = await pool.query(userQuery, [user_id]);
+    const userName = userResult.rows[0]?.user_name || 'Unknown User';
+
+    // Fetch candidate name based on candidate_id
+    const candidateQuery = 'SELECT candidate_name FROM candidates WHERE candidate_id = $1';
+    const candidateResult = await pool.query(candidateQuery, [candidate_id]);
+    const candidateName = candidateResult.rows[0]?.candidate_name || 'Unknown Candidate';
+
+    // Add a notification
+    const notificationMessage = `${userName} ${acknowledge_name} the task for ${candidateName}`;
+    addNotification(notificationMessage);
+
     res.status(200).json({
       success: true,
       message: 'Assignment acknowledgment updated successfully.',
     });
   } catch (error) {
     console.error('Error updating assignment acknowledgment:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal Server Error',
+    });
+  }
+};
+
+
+const getNotify = async (req, res) => {
+  try {
+    // Get all notifications
+    const allNotifications = getNotifications();
+
+    res.status(200).json({
+      success: true,
+      data: allNotifications,
+    });
+  } catch (error) {
+    console.error('Error retrieving notifications:', error);
     res.status(500).json({
       success: false,
       error: 'Internal Server Error',
@@ -232,6 +266,7 @@ module.exports = {
   createAssignment,
   getAssignmentsForUser,
   acknowledgeAssignment,
+  getNotify,
   getId
 };
 

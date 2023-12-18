@@ -166,7 +166,7 @@ const UserList = async (req, res) => {
         u.user_name,
         u.user_email,
         u.admin_flag,
-        s.ind_status_id AS status
+        s.ind_status_name AS status
       FROM
         public.users u
       LEFT JOIN

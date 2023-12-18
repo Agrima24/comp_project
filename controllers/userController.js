@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 
 const signup = async (req, res) => {
   try {
-    const { user_name, user_email, user_password} = req.body;
+    const { user_name, user_email, user_password, user_phone} = req.body;
 
     const emailCheckQuery = "SELECT * FROM users WHERE user_email = $1";
     const emailCheckResult = await pool.query(emailCheckQuery, [user_email]);
@@ -15,11 +15,12 @@ const signup = async (req, res) => {
       });
     }
     const insertUserQuery =
-      "INSERT INTO users(user_name, user_email, user_password, admin_flag) VALUES ($1, $2, $3, false) RETURNING *";
+      "INSERT INTO users(user_name, user_email, user_password,user_phone, admin_flag) VALUES ($1, $2, $3,$4, false) RETURNING *";
     const result = await pool.query(insertUserQuery, [
       user_name,
       user_email,
       user_password,
+      user_phone
     ]);
 
     res.status(201).json({ success: true, data: result.rows[0] });
@@ -104,7 +105,8 @@ const UserDetails = async (req, res) => {
         u.user_name,
         u.user_email,
         u.admin_flag,
-        s.ind_status
+        s.ind_status,
+        u.user_phone
       FROM
         public.users u
       LEFT JOIN
@@ -166,6 +168,7 @@ const UserList = async (req, res) => {
         u.user_name,
         u.user_email,
         u.admin_flag,
+        u.user_phone,
         s.ind_status_name AS status
       FROM
         public.users u

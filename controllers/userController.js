@@ -193,11 +193,51 @@ const UserList = async (req, res) => {
   }
 };
 
+const edit = async (req, res) => {
+  try {
+    const userId = req.params.user_id;
 
+    const { user_name, user_email, user_phone } = req.body;
+
+    // Use a parameterized query to update user details
+    const updateUserQuery = `
+      UPDATE users
+      SET user_name = $1, user_email = $2, user_phone = $3
+      WHERE user_id = $4
+      RETURNING *;
+    `;
+
+    const values = [user_name,user_email,user_phone, userId];
+    const result = await pool.query(updateUserQuery, values);
+
+    // Check if the user was found and updated
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    const updatedUser = result.rows[0];
+
+    res.status(200).json({
+      success: true,
+      message: 'User details updated successfully',
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.error('Error updating user details:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal Server Error',
+    });
+  }
+};
 
 module.exports = {
   signup,
   signin,
   UserDetails,
-  UserList
+  UserList,
+  edit
 };

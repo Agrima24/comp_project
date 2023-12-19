@@ -113,7 +113,7 @@ const insertCandidateData = async (req, res) => {
     });
   } catch (error) {
     console.error("Error inserting candidate data:", error);
-    res.status(500).json({
+    res.status(500).json({ 
       success: false,
       error: "Internal Server Error",
     });

@@ -8,7 +8,7 @@ const pool = new Pool({
     database: process.env.DB_NAME,
     port: process.env.DB_PORT,
     ssl: {
-      // SSL options if required (depends on your RDS configuration)
+     // SSL options if required (depends on your RDS configuration)
       rejectUnauthorized: false // Use this only if you face certificate verification issues
     }
   });

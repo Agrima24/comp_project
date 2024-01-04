@@ -171,9 +171,9 @@ const UserList = async (req, res) => {
         u.user_phone,
         s.ind_status_name AS status
       FROM
-        public.users u
+        users u
       LEFT JOIN
-        public.ind_status s ON u.ind_status_id = s.ind_status_id
+        ind_status s ON u.ind_status_id = s.ind_status_id
     `;
 
     const result = await pool.query(query);

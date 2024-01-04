@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const db = require('./database/db')
+const db = require('./database/db');
 const cors = require('cors')
 const router = require('./routers/mainRouter')
 
@@ -23,11 +23,25 @@ app.listen(PORT, () => {
 });
 
 // Handle database connection
+
 db.connect((err, client, release) => {
   if (err) {
     console.error('Error connecting to database:', err);
     return;
   }
+
   console.log('Connected to database!');
-  release();
+
+  // Your database interaction goes here
+  // For example, you can execute a query like this:
+  client.query('SELECT VERSION()', (err, result) => {
+    if (err) {
+      console.error('Error executing query:', err);
+    } else {
+      console.log('PostgreSQL version:', result.rows[0].version);
+    }
+
+    // Release the client back to the pool
+    release();
+  });
 });
